@@ -692,5 +692,30 @@
     } catch(e){ console.error('init', e); disableAllTabsExceptHome(); new bootstrap.Tab(el('tabBtnHome')).show(); }
   })();
   </script>
+<script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+<script>
+  // connect to same-origin server (works if index.html served by Flask on Render)
+  const SOCKET = io({ transports: ['websocket','polling'] });
+  SOCKET.on('connect', ()=> console.log('socket connected', SOCKET.id));
+  SOCKET.on('route_created', (data) => {
+    if (data.date === currentSelectedDate) loadRoutesForDate(currentSelectedDate);
+  });
+  SOCKET.on('link_created', (data) => {
+    if (data.date === currentSelectedDate) {
+      if (viewingRouteId === data.route_id || lastCandidatesRouteId === data.route_id) {
+        loadLinksForCurrentRoute(el('linksGender')?.value || 'All');
+      }
+      loadRoutesForDate(currentSelectedDate);
+    }
+  });
+  SOCKET.on('link_deleted', (data) => {
+    if (data.date === currentSelectedDate) {
+      loadLinksForCurrentRoute(el('linksGender')?.value || 'All');
+      loadRoutesForDate(currentSelectedDate);
+    }
+  });
+</script>
+
 </body>
+
 </html>
