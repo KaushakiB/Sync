@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>RouteLink — Web App</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --accent:#0b5878;
+      --accent-2:#e85a4f;
+      --muted:#6c7a89;
+      --card:#ffffff;
+      --bg:#f3fbff;
+    }
+    *{box-sizing:border-box}
+    body{background:var(--bg);font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;margin:0;padding:0}
+    .banner { background: linear-gradient(90deg, rgba(11,88,120,0.06), rgba(232,90,79,0.02)); padding: 22px; border-radius: 8px; display:flex; gap:18px; align-items:center; margin-bottom:18px; }
+    .banner img{ width:120px; height:120px; object-fit:cover; border-radius:12px; box-shadow:0 6px 18px rgba(11,88,120,0.06); }
+    .banner h1{ margin:0; font-size:28px; color:var(--accent); font-weight:800; }
+    .banner p.lead{ margin:6px 0 0 0; color:var(--accent-2); font-weight:700; font-size:20px; }
+    .banner p.sub{ margin:8px 0 0 0; color:var(--muted); font-style:italic; }
+    .topbar{padding:14px 18px;background:linear-gradient(90deg,#f6fbfd,#eef9fb);border-radius:12px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+    .logobox{width:72px;height:72px;border-radius:12px;background:linear-gradient(180deg,#fff,#f0fbff);display:flex;align-items:center;justify-content:center}
+    .brand{color:var(--accent);font-weight:800;font-size:22px}
+    .tagline{color:var(--muted);font-style:italic}
+    .section-card{background:var(--card);border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 6px 18px rgba(13,40,50,0.04)}
+    .mini-cal{display:flex;flex-wrap:wrap;gap:6px}
+    .cal-day{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid #e6eef1;user-select:none}
+    .cal-day:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(11,88,120,0.06)}
+    .cal-today{background:var(--accent);color:#fff;font-weight:700}
+    .cal-weekend{background:linear-gradient(180deg,#fff8e6,#fff5e0); color:#7b5200; border:1px solid #ffe7b5}
+    .cal-festival{background:linear-gradient(180deg,#fff0f0,#fff8f8); color:#b33; border:1px solid #ffdede}
+    .slot-pill{background:#ecfbf9;color:#0a6b5b;padding:6px 10px;border-radius:999px;font-weight:700}
+    .transport-pill{background:#eef6ff;color:#0b5878;padding:4px 8px;border-radius:8px;font-weight:600;border:1px solid #d6eaf6}
+    .muted-small{color:var(--muted);font-size:0.95rem}
+    .hidden{display:none!important}
+    .nav-locked .nav-link{opacity:0.45;pointer-events:none}
+    .feature-card { border-radius:12px; padding:12px; background: linear-gradient(180deg,#ffffff,#fbfeff); box-shadow:0 4px 12px rgba(11,88,120,0.03) }
+    .btn-delete { background: transparent; border: 1px solid #f8d7da; color: #c82333; }
+    .small-muted { color:#9aa6ad; font-size:0.95rem; }
+    .legend { display:flex; gap:12px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+    .legend .item { display:flex; gap:6px; align-items:center; font-size:0.92rem; color:var(--muted); }
+    .legend .sw { width:18px; height:18px; border-radius:4px; display:inline-block }
+    .sw-weekend { background: linear-gradient(180deg,#fff8e6,#fff5e0); border:1px solid #ffe7b5 }
+    .sw-fest { background: linear-gradient(180deg,#fff0f0,#fff8f8); border:1px solid #ffdede }
+    .sw-today { background: var(--accent); border-radius:4px; }
+    @media (max-width:900px){ .banner{flex-direction:column;align-items:flex-start} }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+
+    <!-- Banner -->
+    <div class="banner">
+      <img src="/static/banner.jpg" alt="banner" onerror="this.src='/static/logo.png'"/>
+      <div>
+        <h1><i class="bi bi-people-fill" style="color:var(--accent)"></i> RouteLink</h1>
+        <p class="lead">A student-first travel connection platform for VIT students</p>
+        <p class="sub">Plan, match, and share journeys — smartly, safely, and together.</p>
+      </div>
+    </div>
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <div class="logobox">
+          <img src="/static/logo.png" alt="logo" width="52" height="52" onerror="this.src='https://img.icons8.com/fluency/48/bus.png'"/>
+        </div>
+        <div>
+          <div class="brand">RouteLink Web</div>
+          <div class="tagline">Every Link Counts, Every Route Matters</div>
+        </div>
+      </div>
+
+      <div class="ms-auto d-flex align-items-center gap-2" id="authArea">
+        <input id="top_email" class="form-control form-control-sm" placeholder="email@vitstudent.ac.in" style="width:220px"/>
+        <input id="top_pw" type="password" class="form-control form-control-sm" placeholder="Password" style="width:170px"/>
+        <button id="btnTopLogin" class="btn btn-sm btn-primary">Login</button>
+        <button id="btnOpenRegister" class="btn btn-sm btn-outline-primary">Register</button>
+      </div>
+
+      <!-- Logout always visible -->
+      <div class="ms-3">
+        <button id="btnLogout" class="btn btn-sm btn-outline-danger">Logout</button>
+      </div>
+
+      <div id="loggedBlock" class="d-flex align-items-center gap-2 hidden ms-3">
+        <div class="muted-small">Welcome, <strong id="userName"></strong></div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <ul class="nav nav-tabs mb-3 nav-locked" id="mainTabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" id="tabBtnHome" data-bs-toggle="tab" data-bs-target="#tab-home">Home</button></li>
+      <li class="nav-item"><button class="nav-link disabled" id="tabBtnCalendar" data-bs-toggle="tab" data-bs-target="#tab-calendar">Calendar</button></li>
+      <li class="nav-item"><button class="nav-link disabled" id="tabBtnRoutes" data-bs-toggle="tab" data-bs-target="#tab-routes">Route Details</button></li>
+      <li class="nav-item"><button class="nav-link disabled" id="tabBtnLinks" data-bs-toggle="tab" data-bs-target="#tab-links">Link Details</button></li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- HOME -->
+      <div class="tab-pane fade show active section-card" id="tab-home">
+        <div class="row">
+          <div class="col-lg-6">
+            <h4><i class="bi bi-box-arrow-in-right"></i> Login</h4>
+            <p class="small-muted">Sign in with your VIT student email to access scheduling features.</p>
+            <div class="mb-2"><input id="login_email" class="form-control" placeholder="email@vitstudent.ac.in"></div>
+            <div class="mb-2"><input id="login_pw" type="password" class="form-control" placeholder="Password"></div>
+            <div class="d-flex gap-2">
+              <button id="doLogin" class="btn btn-primary">Login</button>
+              <button id="clearLogin" class="btn btn-outline-secondary">Clear</button>
+            </div>
+            <div class="mt-2 text-danger small" id="loginMsg"></div>
+          </div>
+
+          <div class="col-lg-6">
+            <h4><i class="bi bi-person-plus-fill"></i> Register</h4>
+            <p class="small-muted">Create an account using your VIT student email.</p>
+            <div class="mb-2"><input id="reg_name" class="form-control" placeholder="Full name"></div>
+            <div class="mb-2"><input id="reg_email" class="form-control" placeholder="email@vitstudent.ac.in"></div>
+            <div class="mb-2"><input id="reg_pw" type="password" class="form-control" placeholder="Password"></div>
+            <div class="mb-2 d-flex gap-2 align-items-center">
+              <select id="reg_gender" class="form-select" style="width:120px"><option value="M">Male</option><option value="F">Female</option></select>
+              <button id="doRegister" class="btn btn-outline-primary">Register</button>
+            </div>
+            <div class="mt-2 text-danger small" id="regMsg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div class="tab-pane fade section-card hidden" id="tab-calendar">
+        <div class="row">
+          <div class="col-md-4">
+            <h5><i class="bi bi-calendar4-week"></i> Calendar</h5>
+            <p class="small-muted">Hover dates to preview routes. Click a date to view Route Details. Past dates cannot be scheduled.</p>
+
+            <div id="miniCalendar" class="mini-cal mb-3"></div>
+
+            <div class="legend">
+              <div class="item"><span class="sw sw-weekend"></span> <span class="muted-small">Weekend</span></div>
+              <div class="item"><span class="sw sw-fest"></span> <span class="muted-small">Festival / Holiday</span></div>
+              <div class="item"><span class="sw sw-today"></span> <span class="muted-small">Today</span></div>
+            </div>
+
+            <div class="mt-3">
+              <h6 class="mb-2">Holidays</h6>
+              <ul id="holList" class="small-muted"></ul>
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5><i class="bi bi-truck"></i> Routes on <span id="routesDateLabel"></span></h5>
+              <div class="small-muted">Select a route in Route Details to view candidates.</div>
+            </div>
+            <div id="routesContainer" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROUTE DETAILS (Add Route button moved here) -->
+      <div class="tab-pane fade section-card hidden" id="tab-routes">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5><i class="bi bi-signpost-2-fill"></i> Route Details — <span id="routeTabDate"></span></h5>
+          <div>
+            <button id="btnAddRoute" class="btn btn-success me-2">➕ Add Route</button>
+            <button id="btnRefreshRoutes" class="btn btn-outline-secondary">Refresh</button>
+          </div>
+        </div>
+        <div id="routesTable"></div>
+      </div>
+
+      <!-- LINK DETAILS -->
+      <div class="tab-pane fade section-card hidden" id="tab-links">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5><i class="bi bi-people-fill"></i> Link Details for <span id="linksRouteLabel"></span></h5>
+          <div class="d-flex align-items-center gap-2">
+            <label class="me-2 small">Gender</label>
+            <select id="linksGender" class="form-select form-select-sm" style="width:120px"><option>All</option><option>Male</option><option>Female</option></select>
+            <button id="btnFilterLinks" class="btn btn-sm btn-outline-secondary">Filter</button>
+            <button id="btnOpenJoin" class="btn btn-sm btn-primary">Join this route</button>
+            <button id="btnRefreshLinks" class="btn btn-sm btn-outline-secondary">Refresh</button>
+          </div>
+        </div>
+
+        <div id="linksArea">
+          <table class="table table-hover">
+            <thead class="table-light"><tr><th>Name</th><th>Gender</th><th>Drop</th><th>Phone</th><th>Year</th><th>Branch</th><th>Action</th></tr></thead>
+            <tbody id="linksTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div> <!-- tab-content end -->
+
+    <!-- Add Route Modal -->
+    <div class="modal fade" id="modalAddRoute" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Route — <small id="modalRouteDate"></small></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless">
+              <tbody>
+                <tr><td style="width:160px"><label>Slot No</label></td><td><input id="modal_slot" class="form-control" readonly></td></tr>
+                <tr><td><label>End Point</label></td><td><input id="modal_endpoint" class="form-control" placeholder="Main Gate"></td></tr>
+                <tr><td><label>Major Stops</label></td><td><input id="modal_stops" class="form-control" placeholder="Comma separated"></td></tr>
+                <tr><td><label>Time (HH:MM)</label></td><td><input id="modal_time" class="form-control" placeholder="09:30"></td></tr>
+                <tr><td><label>Transport</label></td><td><select id="modal_transport" class="form-select" style="width:160px"><option value="">(select)</option><option value="bus">Bus</option><option value="car">Car</option></select></td></tr>
+              </tbody>
+            </table>
+            <div id="modalAddRouteMsg" class="text-danger small"></div>
+          </div>
+          <div class="modal-footer">
+            <button id="modalAddRouteCancel" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="modalAddRouteSubmit" class="btn btn-success">Create Route</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidates Modal -->
+    <div class="modal fade" id="modalCandidates" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Candidates for <span id="candRouteLabel"></span></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="candidatesList" class="list-group"></div>
+            <div id="candidatesMsg" class="text-muted small mt-2"></div>
+          </div>
+          <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Join Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasJoin" aria-labelledby="offcanvasJoinLabel">
+      <div class="offcanvas-header">
+        <h5 id="offcanvasJoinLabel">Join Route — <small id="offcanvasJoinDate"></small></h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div id="offJoinRouteInfo" class="mb-2"></div>
+        <div class="mb-2"><label class="form-label small">Name</label><input id="join_name" class="form-control" readonly></div>
+        <div class="mb-2"><label class="form-label small">Gender</label><select id="join_gender" class="form-select"><option value="M">M</option><option value="F">F</option></select></div>
+        <div class="mb-2"><label class="form-label small">Phone</label><input id="join_phone" class="form-control" placeholder="Phone"></div>
+        <div class="mb-2"><label class="form-label small">Year</label><input id="join_year" class="form-control" placeholder="Year"></div>
+        <div class="mb-2"><label class="form-label small">Branch</label><input id="join_branch" class="form-control" placeholder="Branch"></div>
+        <div class="mb-2"><label class="form-label small">Drop point</label><input id="join_drop" class="form-control" readonly></div>
+        <div class="mt-2"><button id="btnDoJoinOff" class="btn btn-primary">Join</button> <span id="joinOffMsg" class="text-danger ms-2"></span></div>
+      </div>
+    </div>
+
+  </div> <!-- container -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  // Utilities
+  const el = id => document.getElementById(id);
+  function localIso(y,m,d){ return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+  function todayLocalIso(){ const n=new Date(); return localIso(n.getFullYear(), n.getMonth()+1, n.getDate()); }
+
+  let loggedUser = null;            // {name,email}
+  let currentSelectedDate = todayLocalIso();
+  let lastCandidatesRouteId = null; // route id that was inspected (enables Link Details)
+  let viewingRouteId = null;        // route currently being viewed in links
+
+  function fetchWithCreds(url, opts={}){ opts.credentials = opts.credentials || 'same-origin'; return fetch(url, opts); }
+
+  // Tab helpers
+  function disableAllTabsExceptHome(){
+    el('tabBtnCalendar').classList.add('disabled');
+    el('tabBtnRoutes').classList.add('disabled');
+    el('tabBtnLinks').classList.add('disabled');
+    document.querySelector('#mainTabs').classList.add('nav-locked');
+    document.querySelectorAll('.tab-pane').forEach(p => { if (p.id !== 'tab-home') p.classList.add('hidden'); });
+  }
+  function enableCalendarOnly(){
+    el('tabBtnCalendar').classList.remove('disabled');
+    document.querySelector('#mainTabs').classList.remove('nav-locked');
+    el('tab-calendar').classList.remove('hidden');
+    el('tab-routes').classList.remove('hidden');
+    el('tab-links').classList.remove('hidden');
+    el('tabBtnRoutes').classList.add('disabled');
+    el('tabBtnLinks').classList.add('disabled');
+  }
+  function enableRoutes(){ el('tabBtnRoutes').classList.remove('disabled'); }
+  function enableLinks(){ el('tabBtnLinks').classList.remove('disabled'); }
+
+  // DOM wiring
+  document.addEventListener('DOMContentLoaded', ()=> {
+    // initial state: always home
+    disableAllTabsExceptHome();
+    new bootstrap.Tab(el('tabBtnHome')).show();
+    if (el('routesDateLabel')) el('routesDateLabel').textContent = currentSelectedDate;
+
+    // Logout button always visible: go to home and clear client-side session
+    el('btnLogout')?.addEventListener('click', async ()=>{
+      try { await fetchWithCreds('/logout', { method:'POST' }); } catch(e){ /* ignore network error */ }
+      loggedUser = null;
+      el('authArea').classList.remove('hidden');
+      el('loggedBlock')?.classList.add('hidden');
+      if (el('top_email')) el('top_email').value=''; if (el('top_pw')) el('top_pw').value='';
+      disableAllTabsExceptHome();
+      new bootstrap.Tab(el('tabBtnHome')).show();
+    });
+
+    // Login handler
+    async function handleLogin(){
+      el('loginMsg').textContent = '';
+      const email = (el('login_email')?.value || el('top_email')?.value || '').trim();
+      const pw = (el('login_pw')?.value || el('top_pw')?.value || '');
+      if (!email || !pw){ el('loginMsg').textContent = 'Email and password required'; return; }
+      try {
+        const res = await fetchWithCreds('/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password: pw }) });
+        const body = await (res.json().catch(()=>({})));
+        if (res.ok){
+          loggedUser = { name: body.name || '', email };
+          el('userName').textContent = loggedUser.name || loggedUser.email;
+          el('authArea').classList.add('hidden');
+          el('loggedBlock')?.classList.remove('hidden');
+          enableCalendarOnly();
+          new bootstrap.Tab(el('tabBtnCalendar')).show();
+          await loadHolidays();
+          buildMiniCalendar();
+          loadRoutesForDate(currentSelectedDate);
+        } else {
+          el('loginMsg').textContent = (body && body.error) ? body.error : `Login failed (${res.status})`;
+        }
+      } catch (e){
+        console.error('login', e);
+        el('loginMsg').textContent = 'Network error — ensure Flask server is running and you opened http://127.0.0.1:5000';
+      }
+    }
+    el('doLogin')?.addEventListener('click', handleLogin);
+    el('btnTopLogin')?.addEventListener('click', handleLogin);
+
+    // Register
+    el('doRegister')?.addEventListener('click', async ()=>{
+      el('regMsg').textContent = '';
+      const name = el('reg_name')?.value.trim() || '', email = el('reg_email')?.value.trim() || '', pw = el('reg_pw')?.value || '', gender = el('reg_gender')?.value || 'M';
+      if (!name || !email || !pw){ el('regMsg').textContent = 'All fields required'; return; }
+      try {
+        const r = await fetchWithCreds('/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, password: pw, gender }) });
+        const body = await (r.json().catch(()=>({})));
+        if (r.ok){ el('regMsg').style.color='green'; el('regMsg').textContent='Registered — please login'; }
+        else { el('regMsg').style.color='red'; el('regMsg').textContent = body.error || `Register failed (${r.status})`; }
+      } catch (e){ console.error('register', e); el('regMsg').textContent = 'Network error'; }
+    });
+
+    // Clear login
+    el('clearLogin')?.addEventListener('click', ()=> {
+      if (el('login_email')) el('login_email').value=''; if (el('login_pw')) el('login_pw').value=''; if (el('top_email')) el('top_email').value=''; if (el('top_pw')) el('top_pw').value='';
+      el('loginMsg').textContent = '';
+    });
+
+    // Add route modal
+    const modalAddRoute = new bootstrap.Modal(document.getElementById('modalAddRoute'));
+    el('btnAddRoute')?.addEventListener('click', async ()=>{
+      if (el('tabBtnRoutes').classList.contains('disabled') && el('tabBtnCalendar').classList.contains('disabled')) { alert('Login required'); return; }
+      el('modalRouteDate').textContent = currentSelectedDate;
+      el('modalAddRouteMsg').textContent = '';
+      try { const r = await fetchWithCreds('/next_slot'); const j = await r.json(); el('modal_slot').value = j.slot || 'SL0000'; } catch(e){ el('modal_slot').value = 'SL0000'; }
+      el('modal_endpoint').value=''; el('modal_stops').value=''; el('modal_time').value=''; el('modal_transport').value='';
+      modalAddRoute.show();
+    });
+
+    el('modalAddRouteSubmit')?.addEventListener('click', async ()=>{
+      const date = currentSelectedDate;
+      const slot = el('modal_slot').value.trim();
+      const endp = el('modal_endpoint').value.trim();
+      const stops = el('modal_stops').value.trim();
+      const time = el('modal_time').value.trim();
+      const transport = el('modal_transport').value.trim();
+      if (!date || !slot || !endp){ el('modalAddRouteMsg').textContent = 'Date, Slot and End Point are required'; return; }
+      if (time && !/^\d{2}:\d{2}$/.test(time)){ el('modalAddRouteMsg').textContent = 'Time must be HH:MM'; return; }
+      try {
+        const r = await fetchWithCreds('/routes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ date, slot_no:slot, end_point:endp, major_stops:stops, time, transport_type:transport }) });
+        if (r.status === 201) { modalAddRoute.hide(); await loadRoutesForDate(date); }
+        else { const txt = await r.text(); el('modalAddRouteMsg').textContent = txt || `Error (${r.status})`; }
+      } catch (e){ console.error('add route', e); el('modalAddRouteMsg').textContent = 'Network error'; }
+    });
+
+    // Join offcanvas open
+    el('btnOpenJoin')?.addEventListener('click', async ()=>{
+      const rid = lastCandidatesRouteId || viewingRouteId;
+      if (!rid){ alert('Open a route from Route Details first (double-click its row) to join'); return; }
+      el('offcanvasJoinDate').textContent = currentSelectedDate;
+      try {
+        const r = await fetchWithCreds('/calendar/' + currentSelectedDate);
+        const rows = await r.json();
+        const route = rows.find(x=>x.id === rid);
+        el('offJoinRouteInfo').innerHTML = route ? `<div><strong>${route.slot_no} → ${route.end_point}</strong></div><div class="small-muted">${route.major_stops || ''}</div>` : '';
+        el('join_drop').value = route ? (route.end_point || '') : '';
+      } catch(e){ el('offJoinRouteInfo').innerHTML = ''; }
+      if (loggedUser && el('join_name')){ el('join_name').value = loggedUser.name || ''; el('join_name').readOnly = true; }
+      const oc = new bootstrap.Offcanvas(document.getElementById('offcanvasJoin')); oc.show();
+    });
+
+    el('btnDoJoinOff')?.addEventListener('click', async ()=>{
+      const rid = lastCandidatesRouteId || viewingRouteId;
+      if (!rid){ el('joinOffMsg').textContent = 'No route selected'; return; }
+      const payload = {
+        date: currentSelectedDate,
+        name: el('join_name')?.value || '',
+        gender: el('join_gender')?.value || 'M',
+        drop: el('join_drop')?.value || '',
+        phone: el('join_phone')?.value || '',
+        course_year: el('join_year')?.value || '',
+        branch: el('join_branch')?.value || ''
+      };
+      el('joinOffMsg').textContent = '';
+      try {
+        const r = await fetchWithCreds(`/routes/${rid}/join`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if (r.status === 201){
+          el('joinOffMsg').style.color='green'; el('joinOffMsg').textContent = 'Joined';
+          await loadLinksForCurrentRoute(el('linksGender')?.value || 'All');
+          await loadRoutesForDate(currentSelectedDate);
+        } else {
+          const txt = await r.text(); el('joinOffMsg').style.color='red'; el('joinOffMsg').textContent = txt;
+        }
+      } catch(e){ console.error('join', e); el('joinOffMsg').style.color='red'; el('joinOffMsg').textContent = 'Network error'; }
+    });
+
+    // refresh & filters
+    el('btnRefreshRoutes')?.addEventListener('click', ()=> loadRoutesForDate(currentSelectedDate));
+    el('btnRefreshLinks')?.addEventListener('click', ()=> loadLinksForCurrentRoute(el('linksGender')?.value || 'All'));
+    el('btnFilterLinks')?.addEventListener('click', ()=> loadLinksForCurrentRoute(el('linksGender')?.value || 'All'));
+    el('linksGender')?.addEventListener('change', ()=> loadLinksForCurrentRoute(el('linksGender')?.value || 'All'));
+  }); // DOMContentLoaded end
+
+  // Holidays & Calendar
+  async function loadHolidays(){
+    try {
+      const r = await fetchWithCreds('/holidays');
+      window.__hols = await r.json();
+      const ul = el('holList'); if (ul){ ul.innerHTML=''; (window.__hols||[]).forEach(h=>{ const li=document.createElement('li'); li.textContent = `${new Date(h).toLocaleDateString()} — ${h}`; ul.appendChild(li); }); }
+    } catch(e){ window.__hols = []; }
+  }
+  function isPast(iso){ return new Date(iso) < new Date(todayLocalIso()); }
+  function todayLocalIso(){ const n=new Date(); return localIso(n.getFullYear(), n.getMonth()+1, n.getDate()); }
+
+  async function buildMiniCalendar(monthOffset=0){
+    const base = new Date(); base.setMonth(base.getMonth() + monthOffset);
+    const year = base.getFullYear(), month = base.getMonth();
+    const first = new Date(year, month, 1);
+    const days = new Date(year, month+1, 0).getDate();
+    const startWeekday = (first.getDay() + 6) % 7; // Mon=0
+    const container = el('miniCalendar'); if (!container) return; container.innerHTML = '';
+    const hdr = document.createElement('div'); hdr.className = 'd-flex justify-content-between align-items-center mb-2';
+    hdr.innerHTML = `<div><strong>${first.toLocaleString(undefined,{month:'long', year:'numeric'})}</strong></div><div><button id="prevM" class="btn btn-sm btn-outline-secondary me-1">&lt;</button><button id="nextM" class="btn btn-sm btn-outline-secondary">&gt;</button></div>`;
+    container.appendChild(hdr);
+    const wd = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; const wdrow=document.createElement('div'); wdrow.className='d-flex gap-1 mb-2';
+    wd.forEach(d=>{ const s=document.createElement('div'); s.style.width='44px'; s.style.textAlign='center'; s.style.color='#7b8a93'; s.textContent=d; wdrow.appendChild(s); });
+    container.appendChild(wdrow);
+    const grid = document.createElement('div'); grid.className='d-flex flex-wrap gap-2';
+    for(let i=0;i<startWeekday;i++){ const blank=document.createElement('div'); blank.style.width='44px'; blank.style.height='44px'; grid.appendChild(blank); }
+    for(let day=1; day<=days; day++){
+      const iso = localIso(year, month+1, day);
+      const dEl = document.createElement('div'); dEl.className='cal-day'; dEl.textContent = day;
+      const dt = new Date(year, month, day);
+      const wk = dt.getDay(); // 0 Sun .. 6 Sat
+      if (wk === 0 || wk === 6) dEl.classList.add('cal-weekend');
+      if ((window.__hols||[]).includes(iso)) dEl.classList.add('cal-festival');
+      if (iso === todayLocalIso()) dEl.classList.add('cal-today');
+
+      dEl.onmouseenter = async () => {
+        let summ = '';
+        try { const r = await fetchWithCreds('/calendar/' + iso); const js = await r.json(); if (js && js.length) summ = js.map((s,i)=> `${i+1}) ${s.slot_no} → ${s.end_point || '-'} @ ${s.time || '-'}`).join('\n'); else if ((window.__hols||[]).includes(iso)) summ = 'Holiday'; else if (isPast(iso)) summ = 'Past — cannot schedule'; else summ = 'No routes — click'; } catch(e){ summ='Unable to load'; }
+        dEl.title = summ;
+      };
+      dEl.onclick = () => {
+        if (isPast(iso)){ alert('This date has passed. Scheduling disabled.'); return; }
+        currentSelectedDate = iso;
+        if (el('routesDateLabel')) el('routesDateLabel').textContent = iso;
+        enableRoutes();
+        new bootstrap.Tab(el('tabBtnRoutes')).show();
+        loadRoutesForDate(iso);
+      };
+      grid.appendChild(dEl);
+    }
+    container.appendChild(grid);
+    el('prevM').onclick = ()=> buildMiniCalendar(monthOffset-1);
+    el('nextM').onclick = ()=> buildMiniCalendar(monthOffset+1);
+  }
+
+  // Routes + counter + transport logic
+  async function loadRoutesForDate(iso){
+    if (el('routesDateLabel')) el('routesDateLabel').textContent = iso;
+    if (el('routeTabDate')) el('routeTabDate').textContent = iso;
+    try {
+      const res = await fetchWithCreds('/calendar/' + iso);
+      const js = await res.json();
+      const container = el('routesContainer'); if (!container) return; container.innerHTML = '';
+      if (!js || js.length === 0) container.innerHTML = '<div class="muted-small">No routes yet. Use "Add Route" to create one.</div>';
+      else {
+        for (const route of js){
+          let count = 0;
+          try {
+            const r = await fetchWithCreds(`/route_count?date=${encodeURIComponent(iso)}&route_id=${route.id}`);
+            const j = await r.json(); count = j.count || 0;
+          } catch(e){ count = 0; }
+
+          const card = document.createElement('div'); card.className = 'd-flex justify-content-between align-items-center p-3 mb-2 border rounded';
+          const left = document.createElement('div');
+          const transportLabel = route.transport_type ? `<div class="mt-1"><span class="transport-pill">${route.transport_type}</span></div>` : '';
+          left.innerHTML = `<div><span class="slot-pill">${route.slot_no}</span> <strong class="ms-2">${route.end_point || ''}</strong></div><div class="muted-small">${route.major_stops || ''}</div>${transportLabel}`;
+          const right = document.createElement('div');
+          right.innerHTML = `<div>${route.time || '-'}</div>
+                             <div class="mt-2"><span class="badge bg-info">Counter: ${count}</span>
+                             <button class="btn btn-sm btn-primary ms-2" onclick="openRoutePanel(${route.id})">View</button></div>`;
+          card.appendChild(left); card.appendChild(right);
+          container.appendChild(card);
+        }
+      }
+      await buildRouteTable(js, iso);
+    } catch(e){ console.error('loadRoutesForDate', e); }
+  }
+
+  async function buildRouteTable(routes, iso){
+    const wrapper = el('routesTable'); if (!wrapper) return; wrapper.innerHTML = '';
+    const table = document.createElement('table'); table.className = 'table table-hover';
+    const thead = document.createElement('thead'); thead.innerHTML = '<tr><th>Slot</th><th>End Point</th><th>Major Stops</th><th>Time</th><th>Transport</th><th>Counter</th></tr>';
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    for (const route of (routes || [])){
+      let count = 0;
+      try {
+        const r = await fetchWithCreds(`/route_count?date=${encodeURIComponent(iso)}&route_id=${route.id}`);
+        const j = await r.json(); count = j.count || 0;
+      } catch(e){ count = 0; }
+
+      const transportText = route.transport_type || '';
+      const tr = document.createElement('tr'); tr.dataset.routeId = route.id;
+      tr.innerHTML = `<td>${route.slot_no}</td>
+                      <td>${route.end_point || ''}</td>
+                      <td>${route.major_stops || ''}</td>
+                      <td>${route.time || '-'}</td>
+                      <td>${transportText ? `<span class="transport-pill">${transportText}</span>` : ''}</td>
+                      <td><span class="badge bg-info">${count}</span></td>`;
+      tr.addEventListener('dblclick', async (ev) => {
+        ev.preventDefault();
+        await showCandidatesForRouteOnce(route.id, route);
+      });
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody); wrapper.appendChild(table);
+  }
+
+  async function openRoutePanel(routeId){
+    try {
+      const r = await fetchWithCreds('/calendar/' + currentSelectedDate);
+      const rows = await r.json();
+      const route = rows.find(x=>x.id === routeId);
+      if (!route){ alert('Route not found'); return; }
+      el('candRouteLabel').textContent = `${route.slot_no} → ${route.end_point || '-'}`;
+      el('candidatesList').innerHTML = `<div class="p-2"><p><strong>Slot:</strong> ${route.slot_no}</p><p><strong>End Point:</strong> ${route.end_point || '-'}</p><p><strong>Major Stops:</strong> ${route.major_stops || '-'}</p><p><strong>Time:</strong> ${route.time || '-'}</p><p><strong>Transport:</strong> ${route.transport_type || '-'}</p><div class="mt-2 small-muted">Double-click the row in Route Details to view candidates (this will unlock Link Details).</div></div>`;
+      el('candidatesMsg').textContent = '';
+      const m = new bootstrap.Modal(document.getElementById('modalCandidates')); m.show();
+    } catch(e){ console.error('openRoutePanel', e); alert('Unable to fetch route'); }
+  }
+
+  async function showCandidatesForRouteOnce(routeId, routeObj){
+    if (lastCandidatesRouteId === routeId){ const m = new bootstrap.Modal(document.getElementById('modalCandidates')); m.show(); return; }
+    try {
+      el('candRouteLabel').textContent = `${routeObj.slot_no} → ${routeObj.end_point || '-'}`;
+      el('candidatesList').innerHTML = '<div class="text-muted small">Loading candidates...</div>';
+      el('candidatesMsg').textContent = '';
+      const resp = await fetchWithCreds(`/routes/${routeId}/links?date=${encodeURIComponent(currentSelectedDate)}`);
+      if (!resp.ok){ el('candidatesList').innerHTML = '<div class="text-danger small">Unable to load candidates</div>'; }
+      else {
+        const people = await resp.json();
+        if (!people || people.length === 0) el('candidatesList').innerHTML = '<div class="muted-small">No candidates joined this route yet.</div>';
+        else {
+          const ul = document.createElement('div'); ul.className = 'list-group';
+          people.forEach(p => {
+            const a = document.createElement('div'); a.className = 'list-group-item';
+            a.innerHTML = `<div><strong>${p.name}</strong> <small class="text-muted">(${p.course_year || ''} - ${p.branch || ''})</small></div><div>${p.drop_point || ''} • ${p.phone || ''}</div>`;
+            ul.appendChild(a);
+          });
+          el('candidatesList').innerHTML = ''; el('candidatesList').appendChild(ul);
+        }
+      }
+      enableLinks();
+      lastCandidatesRouteId = routeId;
+      const m = new bootstrap.Modal(document.getElementById('modalCandidates')); m.show();
+    } catch(e){ console.error('showCandidates', e); el('candidatesList').innerHTML = '<div class="text-danger small">Network error</div>'; }
+  }
+
+  // Links: render + filter + delete + join integration
+  async function loadLinksForCurrentRoute(filterGender = 'All'){
+    const rid = lastCandidatesRouteId;
+    viewingRouteId = rid || null;
+    if (!rid){
+      try {
+        const param = (filterGender && filterGender !== 'All') ? `?gender=${filterGender[0].toUpperCase()}` : '';
+        const r = await fetchWithCreds('/links' + param);
+        const list = await r.json();
+        renderLinksTable(list);
+      } catch(e){ console.error('loadAllLinks', e); }
+      if (el('linksRouteLabel')) el('linksRouteLabel').textContent = `All Links`;
+      return;
+    }
+    try {
+      const r = await fetchWithCreds(`/routes/${rid}/links?date=${encodeURIComponent(currentSelectedDate)}`);
+      let people = await r.json();
+      if (filterGender && filterGender !== 'All') people = people.filter(p => (p.gender||'').toLowerCase() === filterGender[0].toLowerCase());
+      renderLinksTable(people);
+      if (el('linksRouteLabel')) el('linksRouteLabel').textContent = `Route ${rid} — ${currentSelectedDate}`;
+    } catch(e){ console.error('loadLinksForCurrentRoute', e); }
+  }
+
+  function renderLinksTable(list){
+    const tbody = el('linksTbody'); if (!tbody) return; tbody.innerHTML = '';
+    if (!list || list.length === 0){ tbody.innerHTML = '<tr><td colspan="7" class="muted-small">No links</td></tr>'; return; }
+    for (const p of list){
+      const tr = document.createElement('tr');
+      let actionHtml = '<button class="btn btn-sm btn-outline-secondary" disabled>—</button>';
+      if (loggedUser && loggedUser.name && p.name && loggedUser.name.trim().toLowerCase() === p.name.trim().toLowerCase()){
+        actionHtml = `<button class="btn btn-sm btn-danger btn-delete" data-linkid="${p.id}" data-link-name="${p.name}">Delete</button>`;
+      }
+      tr.innerHTML = `<td>${p.name}</td><td>${p.gender||''}</td><td>${p.drop_point||''}</td><td>${p.phone||''}</td><td>${p.course_year||''}</td><td>${p.branch||''}</td><td>${actionHtml}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  // Delete handler (delegated)
+  document.addEventListener('click', async (ev)=>{
+    const btn = ev.target.closest('.btn-delete');
+    if (!btn) return;
+    const linkId = btn.getAttribute('data-linkid'), linkName = btn.getAttribute('data-link-name') || '';
+    if (!linkId) return;
+    if (!confirm(`Remove yourself (${linkName}) from this route?`)) return;
+    try {
+      const r = await fetchWithCreds(`/links/${linkId}`, { method:'DELETE' });
+      if (r.ok){
+        await loadLinksForCurrentRoute(el('linksGender')?.value || 'All');
+        await loadRoutesForDate(currentSelectedDate); // update counters
+      } else {
+        const txt = await r.text(); alert('Delete failed: ' + txt);
+      }
+    } catch(e){ console.error('delete', e); alert('Network error while deleting'); }
+  });
+
+  // tab click handlers
+  document.addEventListener('click', (ev)=>{
+    const t = ev.target;
+    if (!t) return;
+    if (t.id === 'tabBtnLinks' || t.closest('#tabBtnLinks')){
+      if (el('tabBtnLinks').classList.contains('disabled')){ ev.preventDefault(); ev.stopPropagation(); return; }
+      loadLinksForCurrentRoute(el('linksGender')?.value || 'All');
+    }
+    if (t.id === 'tabBtnRoutes' || t.closest('#tabBtnRoutes')){
+      if (el('tabBtnRoutes').classList.contains('disabled')){ ev.preventDefault(); ev.stopPropagation(); return; }
+      loadRoutesForDate(currentSelectedDate);
+    }
+    if (t.id === 'tabBtnCalendar' || t.closest('#tabBtnCalendar')){
+      if (el('tabBtnCalendar').classList.contains('disabled')){ ev.preventDefault(); ev.stopPropagation(); return; }
+    }
+  }, true);
+
+  // startup: check /me
+  (async function init(){
+    try {
+      await loadHolidays();
+      await buildMiniCalendar();
+      if (el('routesDateLabel')) el('routesDateLabel').textContent = currentSelectedDate;
+
+      const meRes = await fetchWithCreds('/me');
+      let meJson;
+      try { meJson = await meRes.json(); } catch(e){ meJson = { id: null }; }
+      if (meJson && meJson.id){
+        loggedUser = { name: meJson.name, email: meJson.email || '' };
+        el('userName').textContent = meJson.name || '';
+        el('authArea').classList.add('hidden'); el('loggedBlock').classList.remove('hidden');
+        enableCalendarOnly();
+        new bootstrap.Tab(el('tabBtnCalendar')).show();
+        loadRoutesForDate(currentSelectedDate);
+      } else {
+        disableAllTabsExceptHome();
+        new bootstrap.Tab(el('tabBtnHome')).show();
+      }
+    } catch(e){ console.error('init', e); disableAllTabsExceptHome(); new bootstrap.Tab(el('tabBtnHome')).show(); }
+  })();
+  </script>
+</body>
+</html>
